@@ -14,9 +14,14 @@ class Model: ObservableObject {
     @Published var displayImage: UIImage?
     
     
-    private let filter = Filter(image: Model.inputImage)
+    let filter = Filter(image: Model.inputImage)
     
     init() {
-        displayImage = filter.applyFilter()
+        let attributes = FilterAttributes(pixelSize: 1)
+        update(with: attributes)
+    }
+    
+    func update(with attributes: FilterAttributes) {
+        displayImage = filter.applyFilter(with: attributes)
     }
 }

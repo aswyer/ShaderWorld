@@ -11,6 +11,10 @@ import Metal
 import MetalKit
 
 
+struct FilterAttributes {
+        var pixelSize: Int
+}
+
 class Filter {
     
     var device: MTLDevice = MTLCreateSystemDefaultDevice()!
@@ -52,7 +56,7 @@ class Filter {
     }
     
     
-    func applyFilter() -> UIImage? {
+    func applyFilter(with attributes: FilterAttributes) -> UIImage? {
         guard let encoder = self.commandEncoder,
               let buffer = self.commandBuffer,
               let pipelineState = pipelineState,
@@ -63,7 +67,12 @@ class Filter {
             return nil
         }
         
-        encoder.setTextures([outputTexture, inputTexture], range: 0..<2)
+        var params = attributes
+        encoder.setBytes(&params, length: MemoryLayout<Filter>.size, index: 0)
+        
+        encoder.setTextures([outputTexture, inputTexture], range: 1..<3)
+//        shaderMaterial.setValue(Data(bytes: &firstStrokeTimeVariableStruct, count: MemoryLayout<strokeTimeVariableStruct>.stride), forKey: "timeVariables");
+        
         encoder.setComputePipelineState(pipelineState)
         encoder.dispatchThreadgroups(getBlockDimentions(), threadsPerThreadgroup: threadsPerBlock) //understand this
         encoder.endEncoding()
